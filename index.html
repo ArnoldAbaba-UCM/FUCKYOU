@@ -3,572 +3,341 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Entity Relationship Diagrams - Database Systems</title>
+    <title>ERD Visualization</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
+
         body {
-            background-color: #f5f7fa;
-            color: #333;
-            line-height: 1.6;
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
             padding: 20px;
         }
-        
+
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 20px;
         }
-        
-        header {
-            text-align: center;
-            margin-bottom: 40px;
-            padding: 20px;
-            background: linear-gradient(135deg, #2c3e50, #4a6491);
-            color: white;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-        
+
         h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
-        
-        .subtitle {
-            font-size: 1.2rem;
-            opacity: 0.9;
-        }
-        
-        .section {
+
+        .scenario-section {
             background: white;
-            border-radius: 10px;
-            padding: 30px;
-            margin-bottom: 40px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
         }
-        
+
         h2 {
-            color: #2c3e50;
-            border-bottom: 2px solid #3498db;
+            color: #333;
+            border-bottom: 3px solid #667eea;
             padding-bottom: 10px;
-            margin-bottom: 25px;
-            font-size: 1.8rem;
+            margin-bottom: 20px;
         }
-        
+
         h3 {
-            color: #2980b9;
-            margin: 20px 0 15px;
-            font-size: 1.4rem;
+            color: #667eea;
+            margin: 15px 0 10px 0;
         }
-        
-        .description {
-            margin-bottom: 25px;
-            padding: 15px;
-            background-color: #f8f9fa;
-            border-left: 4px solid #3498db;
-            border-radius: 4px;
-        }
-        
-        .entities-container {
+
+        /* ERD Diagram Styles */
+        .erd-container {
             display: flex;
+            justify-content: space-around;
+            align-items: flex-start;
             flex-wrap: wrap;
             gap: 30px;
-            margin-bottom: 30px;
+            margin-top: 20px;
         }
-        
+
         .entity {
-            flex: 1;
-            min-width: 250px;
-            border: 2px solid #3498db;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        
-        .entity-header {
-            background-color: #3498db;
-            color: white;
-            padding: 12px 15px;
-            font-weight: bold;
-            text-align: center;
-        }
-        
-        .entity-attributes {
+            background: #f8f9fa;
+            border: 3px solid #667eea;
+            border-radius: 10px;
             padding: 15px;
-            background-color: white;
+            min-width: 250px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
         }
-        
-        .entity-attributes ul {
-            list-style-type: none;
+
+        .entity:hover {
+            transform: translateY(-5px);
         }
-        
-        .entity-attributes li {
-            padding: 8px 0;
-            border-bottom: 1px solid #eee;
+
+        .entity-header {
+            background: #667eea;
+            color: white;
+            padding: 10px;
+            margin: -15px -15px 15px -15px;
+            border-radius: 7px 7px 0 0;
+            text-align: center;
+            font-weight: bold;
         }
-        
-        .entity-attributes li:last-child {
+
+        .entity.intersection .entity-header {
+            background: #e74c3c;
+        }
+
+        .attributes {
+            list-style: none;
+        }
+
+        .attributes li {
+            padding: 8px 5px;
+            border-bottom: 1px solid #e9ecef;
+            font-family: 'Courier New', monospace;
+        }
+
+        .attributes li:last-child {
             border-bottom: none;
         }
-        
+
         .pk {
+            color: #27ae60;
             font-weight: bold;
-            color: #e74c3c;
         }
-        
+
         .fk {
+            color: #e67e22;
             font-style: italic;
-            color: #9b59b6;
         }
-        
+
+        /* Relationships */
         .relationships {
-            margin-top: 30px;
-            padding: 20px;
-            background-color: #f8f9fa;
-            border-radius: 8px;
-        }
-        
-        .relationship-item {
-            margin-bottom: 15px;
-            padding: 10px 15px;
-            background-color: white;
-            border-radius: 6px;
-            border-left: 4px solid #2ecc71;
-        }
-        
-        .diagram-container {
-            margin-top: 30px;
-            padding: 20px;
-            background-color: #f0f7ff;
-            border-radius: 8px;
-            border: 1px dashed #3498db;
-        }
-        
-        .diagram {
-            position: relative;
-            height: 300px;
-            margin: 20px 0;
-        }
-        
-        .entity-box {
-            position: absolute;
-            width: 200px;
-            border: 2px solid #3498db;
-            border-radius: 8px;
-            background-color: white;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-        }
-        
-        .entity-box h4 {
-            background-color: #3498db;
-            color: white;
-            padding: 10px;
-            margin: 0;
             text-align: center;
-            font-size: 1rem;
-        }
-        
-        .entity-attr-list {
+            margin: 20px 0;
+            font-weight: bold;
+            color: #2c3e50;
+            background: rgba(255,255,255,0.9);
             padding: 10px;
+            border-radius: 8px;
         }
-        
-        .entity-attr-list div {
-            padding: 5px 0;
-            font-size: 0.9rem;
-        }
-        
-        .relationship-line {
-            position: absolute;
-            background-color: #2c3e50;
-            transform-origin: 0 0;
-        }
-        
-        .relationship-label {
-            position: absolute;
-            background-color: white;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            border: 1px solid #2c3e50;
-        }
-        
-        .cardinality {
-            position: absolute;
-            background-color: white;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            border: 1px solid #2c3e50;
-        }
-        
-        .grade-report {
+
+        /* Report Table Styles */
+        .report-table {
             width: 100%;
             border-collapse: collapse;
-            margin: 20px 0;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin: 15px 0;
+            background: white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
-        
-        .grade-report th {
-            background-color: #2c3e50;
+
+        .report-table th {
+            background: #34495e;
             color: white;
-            padding: 12px 15px;
+            padding: 12px;
             text-align: left;
         }
-        
-        .grade-report td {
-            padding: 10px 15px;
-            border-bottom: 1px solid #ddd;
+
+        .report-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #ecf0f1;
         }
-        
-        .grade-report tr:nth-child(even) {
-            background-color: #f8f9fa;
+
+        .report-table tr:hover {
+            background: #f8f9fa;
         }
-        
-        .info-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
+
+        .section-header {
+            background: #95a5a6;
+            color: white;
+            padding: 8px 12px;
+            font-weight: bold;
         }
-        
-        .info-table td {
-            padding: 10px 15px;
-            border-bottom: 1px solid #ddd;
+
+        .grade-a {
+            color: #27ae60;
+            font-weight: bold;
         }
-        
-        .info-table tr:last-child td {
-            border-bottom: none;
+
+        .grade-d {
+            color: #e74c3c;
+            font-weight: bold;
         }
-        
-        footer {
-            text-align: center;
-            margin-top: 40px;
-            padding: 20px;
-            color: #7f8c8d;
-            font-size: 0.9rem;
-        }
-        
+
+        /* Responsive Design */
         @media (max-width: 768px) {
-            .entities-container {
+            .erd-container {
                 flex-direction: column;
+                align-items: center;
             }
             
-            .diagram {
-                height: 500px;
+            .entity {
+                width: 100%;
+                max-width: 300px;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>Entity Relationship Diagrams</h1>
-            <p class="subtitle">Database Design for Bridal Registry and College System</p>
-        </header>
-        
-        <!-- Bridal Registry ERD -->
-        <section class="section">
-            <h2>Performance Task 3.2 - Bridal Registry System ERD</h2>
+        <h1>ERD Visualization - Performance Tasks 3.2</h1>
+
+        <!-- Bridal Registry Section -->
+        <div class="scenario-section">
+            <h2>Bridal Registry ERD</h2>
+            <p><strong>Scenario:</strong> A department store bridal registry tracking customers, products, and registrations.</p>
             
-            <div class="description">
-                <p>A department store has a bridal registry. This registry keeps information about the customer (usually the bride), the products that the store carries, and the products for which each customer registers. Customers typically register for a large number of products, and many customers register for the same products.</p>
+            <div class="relationships">
+                CUSTOMER (1) ———— (M) REGISTRY (M) ———— (1) PRODUCT
             </div>
-            
-            <h3>Entities and Attributes</h3>
-            <div class="entities-container">
+
+            <div class="erd-container">
+                <!-- Customer Entity -->
                 <div class="entity">
                     <div class="entity-header">CUSTOMER</div>
-                    <div class="entity-attributes">
-                        <ul>
-                            <li><span class="pk">CustomerID</span> (PK)</li>
-                            <li>FirstName</li>
-                            <li>LastName</li>
-                            <li>ContactInfo</li>
-                            <li>Email</li>
-                            <li>Phone</li>
-                            <li>Address</li>
-                        </ul>
-                    </div>
+                    <ul class="attributes">
+                        <li class="pk">Customer_ID (PK)</li>
+                        <li>Name</li>
+                        <li>Address</li>
+                        <li>Phone</li>
+                        <li>Email</li>
+                    </ul>
                 </div>
-                
+
+                <!-- Registry Entity (Intersection) -->
+                <div class="entity intersection">
+                    <div class="entity-header">REGISTRY</div>
+                    <ul class="attributes">
+                        <li class="fk">Customer_ID (FK)</li>
+                        <li class="fk">Product_ID (FK)</li>
+                        <li>Registration_Date</li>
+                        <li>Quantity_Desired</li>
+                    </ul>
+                </div>
+
+                <!-- Product Entity -->
                 <div class="entity">
                     <div class="entity-header">PRODUCT</div>
-                    <div class="entity-attributes">
-                        <ul>
-                            <li><span class="pk">ProductID</span> (PK)</li>
-                            <li>ProductName</li>
-                            <li>Description</li>
-                            <li>Category</li>
-                            <li>Price</li>
-                            <li>StockQuantity</li>
-                        </ul>
-                    </div>
-                </div>
-                
-                <div class="entity">
-                    <div class="entity-header">REGISTRY</div>
-                    <div class="entity-attributes">
-                        <ul>
-                            <li><span class="pk">RegistryID</span> (PK)</li>
-                            <li><span class="fk">CustomerID</span> (FK)</li>
-                            <li><span class="fk">ProductID</span> (FK)</li>
-                            <li>RegistrationDate</li>
-                            <li>QuantityRequested</li>
-                            <li>Priority</li>
-                        </ul>
-                    </div>
+                    <ul class="attributes">
+                        <li class="pk">Product_ID (PK)</li>
+                        <li>Description</li>
+                        <li>Price</li>
+                        <li>Category</li>
+                    </ul>
                 </div>
             </div>
-            
-            <h3>Relationships</h3>
-            <div class="relationships">
-                <div class="relationship-item">
-                    <strong>Customer to Registry:</strong> One-to-Many (One customer can have multiple registry entries)
-                </div>
-                <div class="relationship-item">
-                    <strong>Product to Registry:</strong> One-to-Many (One product can appear in multiple registry entries)
-                </div>
-                <div class="relationship-item">
-                    <strong>Customer to Product:</strong> Many-to-Many (Through the Registry associative entity)
-                </div>
-            </div>
-            
-            <h3>Visual ERD Diagram</h3>
-            <div class="diagram-container">
-                <div class="diagram" id="bridal-diagram">
-                    <div class="entity-box" style="top: 50px; left: 50px;">
-                        <h4>CUSTOMER</h4>
-                        <div class="entity-attr-list">
-                            <div><span class="pk">CustomerID</span> (PK)</div>
-                            <div>FirstName</div>
-                            <div>LastName</div>
-                            <div>ContactInfo</div>
-                        </div>
-                    </div>
-                    
-                    <div class="entity-box" style="top: 50px; left: 500px;">
-                        <h4>PRODUCT</h4>
-                        <div class="entity-attr-list">
-                            <div><span class="pk">ProductID</span> (PK)</div>
-                            <div>ProductName</div>
-                            <div>Description</div>
-                            <div>Price</div>
-                        </div>
-                    </div>
-                    
-                    <div class="entity-box" style="top: 200px; left: 275px;">
-                        <h4>REGISTRY</h4>
-                        <div class="entity-attr-list">
-                            <div><span class="pk">RegistryID</span> (PK)</div>
-                            <div><span class="fk">CustomerID</span> (FK)</div>
-                            <div><span class="fk">ProductID</span> (FK)</div>
-                            <div>RegistrationDate</div>
-                        </div>
-                    </div>
-                    
-                    <div class="relationship-line" style="top: 130px; left: 250px; width: 150px; transform: rotate(0deg);"></div>
-                    <div class="relationship-line" style="top: 130px; left: 450px; width: 150px; transform: rotate(0deg);"></div>
-                    <div class="relationship-line" style="top: 180px; left: 300px; width: 100px; transform: rotate(90deg);"></div>
-                    <div class="relationship-line" style="top: 180px; left: 450px; width: 100px; transform: rotate(90deg);"></div>
-                    
-                    <div class="cardinality" style="top: 120px; left: 320px;">1</div>
-                    <div class="cardinality" style="top: 120px; left: 430px;">M</div>
-                    <div class="cardinality" style="top: 220px; left: 270px;">1</div>
-                    <div class="cardinality" style="top: 220px; left: 480px;">M</div>
-                </div>
-            </div>
-        </section>
-        
-        <!-- College System ERD -->
-        <section class="section">
-            <h2>College Grade Reporting System ERD</h2>
-            
-            <div class="description">
-                <p>Based on the provided grade report, identify the entities and attributes for a college system for tracking students, courses, instructors, and grades.</p>
-            </div>
-            
-            <h3>Sample Grade Report</h3>
-            <div class="grade-report-container">
-                <table class="info-table">
-                    <tr>
-                        <td><strong>NAME</strong></td>
-                        <td>MARIA COLLIN</td>
-                    </tr>
-                    <tr>
-                        <td><strong>ID</strong></td>
-                        <td>14344</td>
-                    </tr>
-                    <tr>
-                        <td><strong>CAMPUS</strong></td>
-                        <td>208 BROOKS HALL</td>
-                    </tr>
-                    <tr>
-                        <td><strong>MAJOR</strong></td>
-                        <td>INFORMATION TECHNOLOGY</td>
-                    </tr>
-                </table>
-                
-                <table class="grade-report">
-                    <thead>
-                        <tr>
-                            <th>COURSE ID</th>
-                            <th>TITLE</th>
-                            <th>INSTRUCTOR NAME</th>
-                            <th>INSTRUCTOR LOCATION</th>
-                            <th>GRADE</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>SAD22</td>
-                            <td>SYSTEMS ANALYSIS AND DESIGN</td>
-                            <td>CRUZ</td>
-                            <td>RM523</td>
-                            <td>A</td>
-                        </tr>
-                        <tr>
-                            <td>AIS32</td>
-                            <td>ACCOUNTING INFORMATION SYSTEM</td>
-                            <td>SANCHEZ</td>
-                            <td>RM511</td>
-                            <td>D</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            
-            <h3>Entities and Attributes</h3>
-            <div class="entities-container">
+        </div>
+
+        <!-- Grade Report Section -->
+        <div class="scenario-section">
+            <h2>Grade Report Entity Analysis</h2>
+            <p><strong>Entities identified from the sample report:</strong></p>
+
+            <!-- Sample Report Display -->
+            <table class="report-table">
+                <tr>
+                    <td colspan="2" class="section-header">MILLENIUM COLLEGE - GRADE REPORT - FALL SEMESTER 2024</td>
+                </tr>
+                <tr>
+                    <td colspan="2" class="section-header">Student Information</td>
+                </tr>
+                <tr>
+                    <th>Field</th>
+                    <th>Value</th>
+                </tr>
+                <tr>
+                    <td>NAME</td>
+                    <td>MARIA COLLIN</td>
+                </tr>
+                <tr>
+                    <td>ID</td>
+                    <td>14344</td>
+                </tr>
+                <tr>
+                    <td>CAMPUS</td>
+                    <td>208 BROOKS HALL</td>
+                </tr>
+                <tr>
+                    <td>MAJOR</td>
+                    <td>INFORMATION TECHNOLOGY</td>
+                </tr>
+                <tr>
+                    <td colspan="2" class="section-header">Course Details</td>
+                </tr>
+                <tr>
+                    <th>COURSE ID</th>
+                    <th>TITLE</th>
+                    <th>INSTRUCTOR NAME</th>
+                    <th>INSTRUCTOR LOCATION</th>
+                    <th>GRADE</th>
+                </tr>
+                <tr>
+                    <td>SAD22</td>
+                    <td>SYSTEMS ANALYSIS AND DESIGN</td>
+                    <td>CRUZ</td>
+                    <td>RM523</td>
+                    <td class="grade-a">A</td>
+                </tr>
+                <tr>
+                    <td>AIS32</td>
+                    <td>ACCOUNTING INFORMATION SYSTEM</td>
+                    <td>SANCHEZ</td>
+                    <td>RM511</td>
+                    <td class="grade-d">D</td>
+                </tr>
+            </table>
+
+            <!-- Entities from Report -->
+            <div class="erd-container">
+                <!-- Student Entity -->
                 <div class="entity">
                     <div class="entity-header">STUDENT</div>
-                    <div class="entity-attributes">
-                        <ul>
-                            <li><span class="pk">StudentID</span> (PK)</li>
-                            <li>Name</li>
-                            <li>Campus</li>
-                            <li>Major</li>
-                            <li>Address</li>
-                        </ul>
-                    </div>
+                    <ul class="attributes">
+                        <li class="pk">Student_ID (PK)</li>
+                        <li>Name</li>
+                        <li>Campus_Address</li>
+                        <li>Major</li>
+                    </ul>
                 </div>
-                
+
+                <!-- Course Entity -->
                 <div class="entity">
                     <div class="entity-header">COURSE</div>
-                    <div class="entity-attributes">
-                        <ul>
-                            <li><span class="pk">CourseID</span> (PK)</li>
-                            <li>Title</li>
-                            <li><span class="fk">InstructorName</span> (FK)</li>
-                        </ul>
-                    </div>
+                    <ul class="attributes">
+                        <li class="pk">Course_ID (PK)</li>
+                        <li>Title</li>
+                    </ul>
                 </div>
-                
+
+                <!-- Instructor Entity -->
                 <div class="entity">
                     <div class="entity-header">INSTRUCTOR</div>
-                    <div class="entity-attributes">
-                        <ul>
-                            <li><span class="pk">InstructorName</span> (PK)</li>
-                            <li>InstructorLocation</li>
-                        </ul>
-                    </div>
+                    <ul class="attributes">
+                        <li class="pk">Instructor_ID (PK)</li>
+                        <li>Name</li>
+                        <li>Office_Location</li>
+                    </ul>
                 </div>
-                
-                <div class="entity">
+
+                <!-- Enrollment Entity -->
+                <div class="entity intersection">
                     <div class="entity-header">ENROLLMENT</div>
-                    <div class="entity-attributes">
-                        <ul>
-                            <li><span class="pk">EnrollmentID</span> (PK)</li>
-                            <li><span class="fk">StudentID</span> (FK)</li>
-                            <li><span class="fk">CourseID</span> (FK)</li>
-                            <li>Grade</li>
-                            <li>Semester</li>
-                            <li>Year</li>
-                        </ul>
-                    </div>
+                    <ul class="attributes">
+                        <li class="fk">Student_ID (FK)</li>
+                        <li class="fk">Course_ID (FK)</li>
+                        <li>Grade</li>
+                        <li>Semester</li>
+                        <li>Year</li>
+                    </ul>
                 </div>
             </div>
-            
-            <h3>Relationships</h3>
+
             <div class="relationships">
-                <div class="relationship-item">
-                    <strong>Student to Enrollment:</strong> One-to-Many (One student can enroll in multiple courses)
-                </div>
-                <div class="relationship-item">
-                    <strong>Course to Enrollment:</strong> One-to-Many (One course can have multiple students enrolled)
-                </div>
-                <div class="relationship-item">
-                    <strong>Instructor to Course:</strong> One-to-Many (One instructor can teach multiple courses)
-                </div>
-                <div class="relationship-item">
-                    <strong>Student to Course:</strong> Many-to-Many (Through the Enrollment associative entity)
-                </div>
+                STUDENT (1) ———— (M) ENROLLMENT (M) ———— (1) COURSE<br>
+                COURSE (M) ———— taught by ———— (1) INSTRUCTOR
             </div>
-            
-            <h3>Visual ERD Diagram</h3>
-            <div class="diagram-container">
-                <div class="diagram" id="college-diagram">
-                    <div class="entity-box" style="top: 50px; left: 50px;">
-                        <h4>STUDENT</h4>
-                        <div class="entity-attr-list">
-                            <div><span class="pk">StudentID</span> (PK)</div>
-                            <div>Name</div>
-                            <div>Campus</div>
-                            <div>Major</div>
-                        </div>
-                    </div>
-                    
-                    <div class="entity-box" style="top: 50px; left: 500px;">
-                        <h4>INSTRUCTOR</h4>
-                        <div class="entity-attr-list">
-                            <div><span class="pk">InstructorName</span> (PK)</div>
-                            <div>InstructorLocation</div>
-                        </div>
-                    </div>
-                    
-                    <div class="entity-box" style="top: 200px; left: 50px;">
-                        <h4>ENROLLMENT</h4>
-                        <div class="entity-attr-list">
-                            <div><span class="pk">EnrollmentID</span> (PK)</div>
-                            <div><span class="fk">StudentID</span> (FK)</div>
-                            <div><span class="fk">CourseID</span> (FK)</div>
-                            <div>Grade</div>
-                        </div>
-                    </div>
-                    
-                    <div class="entity-box" style="top: 200px; left: 500px;">
-                        <h4>COURSE</h4>
-                        <div class="entity-attr-list">
-                            <div><span class="pk">CourseID</span> (PK)</div>
-                            <div>Title</div>
-                            <div><span class="fk">InstructorName</span> (FK)</div>
-                        </div>
-                    </div>
-                    
-                    <!-- Relationship lines -->
-                    <div class="relationship-line" style="top: 130px; left: 250px; width: 100px; transform: rotate(0deg);"></div>
-                    <div class="relationship-line" style="top: 130px; left: 450px; width: 100px; transform: rotate(0deg);"></div>
-                    <div class="relationship-line" style="top: 180px; left: 300px; width: 100px; transform: rotate(90deg);"></div>
-                    <div class="relationship-line" style="top: 180px; left: 450px; width: 100px; transform: rotate(90deg);"></div>
-                    <div class="relationship-line" style="top: 250px; left: 350px; width: 150px; transform: rotate(0deg);"></div>
-                    
-                    <div class="cardinality" style="top: 120px; left: 270px;">1</div>
-                    <div class="cardinality" style="top: 120px; left: 430px;">M</div>
-                    <div class="cardinality" style="top: 220px; left: 270px;">1</div>
-                    <div class="cardinality" style="top: 220px; left: 430px;">M</div>
-                    <div class="cardinality" style="top: 270px; left: 400px;">1</div>
-                    <div class="cardinality" style="top: 270px; left: 500px;">M</div>
-                </div>
-            </div>
-        </section>
-        
-        <footer>
-            <p>Database Design - Entity Relationship Diagrams</p>
-            <p>Primary Keys are shown in <span class="pk">red</span>, Foreign Keys in <span class="fk">purple</span></p>
-        </footer>
+        </div>
     </div>
 </body>
 </html>
